@@ -45,8 +45,11 @@ namespace RedSVD
 		
 		const Scalar _PI(3.1415926535897932384626433832795028841971693993751);
 		
-		Scalar v1 = (Scalar)(std::rand() + Scalar(1)) / ((Scalar)RAND_MAX+Scalar(2));
-		Scalar v2 = (Scalar)(std::rand() + Scalar(1)) / ((Scalar)RAND_MAX+Scalar(2));
+		const double rand_min = 1.0 / (RAND_MAX + 2.0);
+		const double rand_max = (RAND_MAX + 1.0) / (RAND_MAX + 2.0);
+		const Rcpp::NumericVector rand_val = Rcpp::runif(2, rand_min, rand_max);
+		Scalar v1 = Scalar(rand_val[0]);
+		Scalar v2 = Scalar(rand_val[1]);
 		Scalar len = sqrt(Scalar(-2) * log(v1));
 		x = len * cos(Scalar(2) * _PI * v2);
 		y = len * sin(Scalar(2) * _PI * v2);
