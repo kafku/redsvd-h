@@ -96,7 +96,7 @@ namespace RedSVD
 		}
 	}
 	
-	template<typename _MatrixType, typename _RNG>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedSVD
 	{
 	public:
@@ -184,7 +184,7 @@ namespace RedSVD
 		DenseMatrix m_matrixV;
 	};
 	
-	template<typename _MatrixType, typename _RNG>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedSymEigen
 	{
 	public:
