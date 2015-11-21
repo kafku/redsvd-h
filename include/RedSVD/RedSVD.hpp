@@ -94,7 +94,7 @@ namespace RedSVD
 		}
 	}
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG>
 	class RedSVD
 	{
 	public:
@@ -128,7 +128,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix for A^T
 			DenseMatrix O(A.rows(), r);
-			sample_gaussian(O);
+			_RNG(O);
 			
 			// Compute Sample Matrix of A^T
 			DenseMatrix Y = A.transpose() * O;
@@ -141,7 +141,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix P(B.cols(), r);
-			sample_gaussian(P);
+			_RNG(P);
 			
 			// Compute Sample Matrix of B
 			DenseMatrix Z = B * P;
@@ -182,7 +182,7 @@ namespace RedSVD
 		DenseMatrix m_matrixV;
 	};
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG>
 	class RedSymEigen
 	{
 	public:
@@ -216,7 +216,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix O(A.rows(), r);
-			sample_gaussian(O);
+			_RNG(O);
 			
 			// Compute Sample Matrix of A
 			DenseMatrix Y = A.transpose() * O;
@@ -271,7 +271,7 @@ namespace RedSVD
 		
 		void compute(const MatrixType& A, const Index rank)
 		{
-			RedSVD<MatrixType> redsvd(A, rank);
+			RedSVD<MatrixType, _RNG> redsvd(A, rank);
 			
 			ScalarVector S = redsvd.singularValues();
 			
