@@ -52,19 +52,21 @@ namespace RedSVD
 		y = len * sin(Scalar(2) * _PI * v2);
 	}
 	
-	template<typename MatrixType>
-	inline void sample_gaussian(MatrixType& mat)
-	{
-		typedef typename MatrixType::Index Index;
-		
-		for(Index i = 0; i < mat.rows(); ++i)
+	struct StdGaussian{
+		template<typename MatrixType>
+		void static operator()(MatrixType& mat)
 		{
-			for(Index j = 0; j+1 < mat.cols(); j += 2)
-				sample_gaussian(mat(i, j), mat(i, j+1));
-			if(mat.cols() % 2)
-				sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+			typedef typename MatrixType::Index Index;
+			
+			for(Index i = 0; i < mat.rows(); ++i)
+			{
+				for(Index j = 0; j+1 < mat.cols(); j += 2)
+					sample_gaussian(mat(i, j), mat(i, j+1));
+				if(mat.cols() % 2)
+					sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+			}
 		}
-	}
+	};
 	
 	template<typename MatrixType>
 	inline void gram_schmidt(MatrixType& mat)
