@@ -54,7 +54,7 @@ namespace RedSVD
 	
 	struct StdGaussian{
 		template<typename MatrixType>
-		void static operator()(MatrixType& mat)
+		static void operator()(MatrixType& mat)
 		{
 			typedef typename MatrixType::Index Index;
 			
