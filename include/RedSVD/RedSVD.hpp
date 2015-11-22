@@ -248,7 +248,7 @@ namespace RedSVD
 		DenseMatrix m_eigenvectors;
 	};
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedPCA
 	{
 	public:
