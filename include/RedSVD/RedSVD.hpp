@@ -52,19 +52,21 @@ namespace RedSVD
 		y = len * sin(Scalar(2) * _PI * v2);
 	}
 	
-	template<typename MatrixType>
-	inline void sample_gaussian(MatrixType& mat)
-	{
-		typedef typename MatrixType::Index Index;
-		
-		for(Index i = 0; i < mat.rows(); ++i)
+	struct StdGaussian{
+		template<typename MatrixType>
+		static void operator()(MatrixType& mat)
 		{
-			for(Index j = 0; j+1 < mat.cols(); j += 2)
-				sample_gaussian(mat(i, j), mat(i, j+1));
-			if(mat.cols() % 2)
-				sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+			typedef typename MatrixType::Index Index;
+			
+			for(Index i = 0; i < mat.rows(); ++i)
+			{
+				for(Index j = 0; j+1 < mat.cols(); j += 2)
+					sample_gaussian(mat(i, j), mat(i, j+1));
+				if(mat.cols() % 2)
+					sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+			}
 		}
-	}
+	};
 	
 	template<typename MatrixType>
 	inline void gram_schmidt(MatrixType& mat)
@@ -94,7 +96,7 @@ namespace RedSVD
 		}
 	}
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedSVD
 	{
 	public:
@@ -128,7 +130,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix for A^T
 			DenseMatrix O(A.rows(), r);
-			sample_gaussian(O);
+			_RNG(O);
 			
 			// Compute Sample Matrix of A^T
 			DenseMatrix Y = A.transpose() * O;
@@ -141,7 +143,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix P(B.cols(), r);
-			sample_gaussian(P);
+			_RNG(P);
 			
 			// Compute Sample Matrix of B
 			DenseMatrix Z = B * P;
@@ -182,7 +184,7 @@ namespace RedSVD
 		DenseMatrix m_matrixV;
 	};
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedSymEigen
 	{
 	public:
@@ -216,7 +218,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix O(A.rows(), r);
-			sample_gaussian(O);
+			_RNG(O);
 			
 			// Compute Sample Matrix of A
 			DenseMatrix Y = A.transpose() * O;
@@ -246,7 +248,7 @@ namespace RedSVD
 		DenseMatrix m_eigenvectors;
 	};
 	
-	template<typename _MatrixType>
+	template<typename _MatrixType, typename _RNG = StdGaussian>
 	class RedPCA
 	{
 	public:
@@ -271,7 +273,7 @@ namespace RedSVD
 		
 		void compute(const MatrixType& A, const Index rank)
 		{
-			RedSVD<MatrixType> redsvd(A, rank);
+			RedSVD<MatrixType, _RNG> redsvd(A, rank);
 			
 			ScalarVector S = redsvd.singularValues();
 			
