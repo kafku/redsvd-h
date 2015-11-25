@@ -52,7 +52,7 @@ namespace RedSVD
 		y = len * sin(Scalar(2) * _PI * v2);
 	}
 	
-	struct StdGaussian{
+	struct CppGaussian{
 		template<typename MatrixType>
 		static void set(MatrixType& mat)
 		{
@@ -96,7 +96,7 @@ namespace RedSVD
 		}
 	}
 	
-	template<typename _MatrixType, typename _RNG = StdGaussian>
+	template<typename _MatrixType, typename _RNG = CppGaussian>
 	class RedSVD
 	{
 	public:
@@ -184,7 +184,7 @@ namespace RedSVD
 		DenseMatrix m_matrixV;
 	};
 	
-	template<typename _MatrixType, typename _RNG = StdGaussian>
+	template<typename _MatrixType, typename _RNG = CppGaussian>
 	class RedSymEigen
 	{
 	public:
@@ -248,7 +248,7 @@ namespace RedSVD
 		DenseMatrix m_eigenvectors;
 	};
 	
-	template<typename _MatrixType, typename _RNG = StdGaussian>
+	template<typename _MatrixType, typename _RNG = CppGaussian>
 	class RedPCA
 	{
 	public:
