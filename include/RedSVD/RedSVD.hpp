@@ -54,7 +54,7 @@ namespace RedSVD
 	
 	struct StdGaussian{
 		template<typename MatrixType>
-		static void operator()(MatrixType& mat)
+		static void set(MatrixType& mat)
 		{
 			typedef typename MatrixType::Index Index;
 			
@@ -130,7 +130,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix for A^T
 			DenseMatrix O(A.rows(), r);
-			_RNG(O);
+			_RNG::set(O);
 			
 			// Compute Sample Matrix of A^T
 			DenseMatrix Y = A.transpose() * O;
@@ -143,7 +143,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix P(B.cols(), r);
-			_RNG(P);
+			_RNG::set(P);
 			
 			// Compute Sample Matrix of B
 			DenseMatrix Z = B * P;
@@ -218,7 +218,7 @@ namespace RedSVD
 			
 			// Gaussian Random Matrix
 			DenseMatrix O(A.rows(), r);
-			_RNG(O);
+			_RNG::set(O);
 			
 			// Compute Sample Matrix of A
 			DenseMatrix Y = A.transpose() * O;
