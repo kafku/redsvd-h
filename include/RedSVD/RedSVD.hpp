@@ -114,12 +114,14 @@ namespace RedSVD
       compute(A, r);
     }
     
-    RedSVD(const MatrixType& A, const Index rank)
+    RedSVD(const MatrixType& A, const Index rank,
+           const int power_iter = 5, const int l = 20)
     {
       compute(A, rank);
     }
     
-    void compute(const MatrixType& A, const Index rank)
+    void compute(const MatrixType& A, const Index rank, 
+                 const int power_iter = 5, const int l = 20)
     {
       if(A.cols() == 0 || A.rows() == 0)
         return;
@@ -128,39 +130,26 @@ namespace RedSVD
       
       r = (r < A.rows()) ? r : A.rows();
       
-      // Gaussian Random Matrix for A^T
-      DenseMatrix O(A.rows(), r);
+      // Gaussian Random Matrix
+      DenseMatrix O(A.cols(), r + l);
       _RNG::set(O);
       
-      // Compute Sample Matrix of A^T
-      DenseMatrix Y = A.transpose() * O;
+      DenseMatrix M(A.rows(), r + l);
+      DenseMatrix B(r + l, A.cols());
       
-      // Orthonormalize Y
-      gram_schmidt(Y);
+      // Power iteration
+      for (int iter = 0; iter < power_iter; ++iter) {
+        M = A * O;
+        gram_schmidt(M);
+        B = M.transpose() * A;
+        O = B.transpose();
+      }
       
-      // Range(B) = Range(A^T)
-      DenseMatrix B = A * Y;
+      Eigen::JacobiSVD<DenseMatrix> svdOfB(B, Eigen::ComputeThinU | Eigen::ComputeThinV);
       
-      // Gaussian Random Matrix
-      DenseMatrix P(B.cols(), r);
-      _RNG::set(P);
-      
-      // Compute Sample Matrix of B
-      DenseMatrix Z = B * P;
-      
-      // Orthonormalize Z
-      gram_schmidt(Z);
-      
-      // Range(C) = Range(B)
-      DenseMatrix C = Z.transpose() * B; 
-      
-      Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinU | Eigen::ComputeThinV);
-      
-      // C = USV^T
-      // A = Z * U * S * V^T * Y^T()
-      m_matrixU = Z * svdOfC.matrixU();
-      m_vectorS = svdOfC.singularValues();
-      m_matrixV = Y * svdOfC.matrixV();
+      m_matrixU = M * (svdOfB.matrixU().topLeftCorner(r + l, r));
+      m_vectorS = svdOfB.singularValues().head(r);
+      m_matrixV = svdOfB.matrixV().topLeftCorner(A.cols(), r);
     }
     
     DenseMatrix matrixU() const
