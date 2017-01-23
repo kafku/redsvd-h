@@ -76,20 +76,16 @@ namespace RedSVD
 
     static const Scalar EPS(1E-4);
 
-    for(Index i = 0; i < mat.cols(); ++i)
+    mat.col(0) /= mat.col(0).norm();
+    for(Index i = 1; i < mat.cols(); ++i)
     {
-      for(Index j = 0; j < i; ++j)
-      {
-        Scalar r = mat.col(i).dot(mat.col(j));
-        mat.col(i) -= r * mat.col(j);
-      }
+      mat.col(i) -= mat.leftCols(i) * (mat.leftCols(i).transpose() * mat.col(i)).eval();
 
       Scalar norm = mat.col(i).norm();
 
       if(norm < EPS)
       {
-        for(Index k = i; k < mat.cols(); ++k)
-          mat.col(k).setZero();
+        mat.rightCols(mat.cols() - i).setZero();
         return;
       }
       mat.col(i) /= norm;
