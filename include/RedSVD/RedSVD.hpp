@@ -92,7 +92,8 @@ namespace RedSVD
     }
   }
 
-  template<typename _MatrixType, typename _RNG = CppGaussian>
+  template<typename _MatrixType, typename SvdPolicy = Eigen::BDCSVD<Eigen::MatrixXd>,
+           typename _RNG = CppGaussian>
   class RedSVD
   {
   public:
@@ -141,7 +142,7 @@ namespace RedSVD
         O = B.transpose();
       }
 
-      Eigen::JacobiSVD<DenseMatrix> svdOfB(B, Eigen::ComputeThinU | Eigen::ComputeThinV);
+      SvdPolicy svdOfB(B, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
       m_matrixU = M * (svdOfB.matrixU().topLeftCorner(r + l, r));
       m_vectorS = svdOfB.singularValues().head(r);
