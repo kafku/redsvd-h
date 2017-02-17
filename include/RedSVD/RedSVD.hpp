@@ -132,15 +132,17 @@ namespace RedSVD
       _RNG::set(O);
 
       DenseMatrix M(A.rows(), r + l);
-      DenseMatrix B(r + l, A.cols());
 
       // Power iteration
       for (int iter = 0; iter < power_iter; ++iter) {
-        M = A * O;
+        M = (A * O).eval();
         gram_schmidt(M);
-        B = M.transpose() * A;
-        O = B.transpose();
+        O = (A.transpose() * M).eval();
+        gram_schmidt(O);
       }
+      M = (A * O).eval();
+      gram_schmidt(M);
+      DenseMatrix B = (M.transpose() * A).eval();
 
       SvdPolicy svdOfB(B, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
