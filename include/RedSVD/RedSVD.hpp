@@ -35,6 +35,42 @@
 
 namespace RedSVD
 {
+  // convert major
+  // col-major sparse -> row-major
+  template<typename Scalar, typename... Args>
+  Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>
+    to_row_major(const Eigen::SparseMatrix<Scalar, 0, Args...>& mat)
+  {
+    return Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>(mat);
+  }
+  // col-major sparse map -> row-major
+  //template<typename Scalar, typename... Args>
+  //Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>
+  //  to_row_major(const Eigen::Map<Eigen::SparseMatrix<Scalar, 0, Args...>>& mat)
+  //{
+  //  return Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>(mat);
+  //}
+  // transpose sparse -> row-major
+  template<typename Scalar, int StOpt, typename... Args>
+  Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>
+    to_row_major(const Eigen::Transpose<const Eigen::SparseMatrix<Scalar, StOpt, Args...>>& mat)
+  {
+    return Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>(mat.eval());
+  }
+  // transpose sparse map -> row-major
+  //template<typename Scalar, Eigen::StorageOptions StOpt, typename... Args>
+  //Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>
+  //  to_row_major(const Eigen::Transpose<const Eigen::Map<Eigen::SparseMatrix<Scalar, StOpt, Args...>>>& mat)
+  //{
+  //  return Eigen::SparseMatrix<Scalar, Eigen::RowMajor, Args...>(mat);
+  //}
+  // do nothing
+  template<typename T>
+  const T& to_row_major(const T& mat)
+  {
+    return mat;
+  }
+
   template<typename Scalar>
   inline void sample_gaussian(Scalar& x, Scalar& y)
   {
@@ -135,14 +171,14 @@ namespace RedSVD
 
       // Power iteration
       for (int iter = 0; iter < power_iter; ++iter) {
-        M = (A * O).eval();
+        M = (to_row_major(A) * O).eval();
         gram_schmidt(M);
-        O = (A.transpose() * M).eval();
+        O = (to_row_major(A.transpose()) * M).eval();
         gram_schmidt(O);
       }
-      M = (A * O).eval();
+      M = (to_row_major(A) * O).eval();
       gram_schmidt(M);
-      DenseMatrix B = (M.transpose() * A).eval();
+      DenseMatrix B = (to_row_major(A.transpose()) * M).eval().transpose().eval();
 
       SvdPolicy svdOfB(B, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
